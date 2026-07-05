@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Computational neuroscience portfolio: EEG/spike pipelines with provenance-aware contamination tracking."
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
+    "numpy<2.0",
     "scipy",
     "mne",
     "torch",
