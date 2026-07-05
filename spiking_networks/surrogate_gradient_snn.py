@@ -60,13 +60,13 @@ def _build_model(n_per_pool: int, beta: float, decay: float):
         """Heaviside spike forward; fast-sigmoid surrogate gradient backward."""
 
         @staticmethod
-        def forward(ctx, v_minus_threshold: "torch.Tensor", beta: float) -> "torch.Tensor":
+        def forward(ctx, v_minus_threshold: torch.Tensor, beta: float) -> torch.Tensor:
             ctx.save_for_backward(v_minus_threshold)
             ctx.beta = beta
             return (v_minus_threshold > 0).float()
 
         @staticmethod
-        def backward(ctx, grad_output: "torch.Tensor"):
+        def backward(ctx, grad_output: torch.Tensor):
             (v_minus_threshold,) = ctx.saved_tensors
             surrogate_grad = 1.0 / (ctx.beta * v_minus_threshold.abs() + 1.0) ** 2
             return grad_output * surrogate_grad, None
@@ -87,7 +87,7 @@ def _build_model(n_per_pool: int, beta: float, decay: float):
             self.register_buffer("pool_a_mask", mask_a)
             self.register_buffer("pool_b_mask", 1.0 - mask_a)
 
-        def forward(self, input_spikes: "torch.Tensor") -> tuple["torch.Tensor", "torch.Tensor"]:
+        def forward(self, input_spikes: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
             batch, n_steps, n = input_spikes.shape
             v = torch.zeros(batch, n, device=input_spikes.device)
             prev_spike = torch.zeros(batch, n, device=input_spikes.device)
@@ -129,9 +129,10 @@ def train(
 
     rng = np.random.default_rng(seed)
     loss_history = []
-    for epoch in range(n_epochs):
+    for _epoch in range(n_epochs):
         coherences = rng.uniform(-1.0, 1.0, size=batch_size)
-        spikes_np, labels_np = generate_task_batch(coherences, n_per_pool, n_steps, seed=None)
+        epoch_seed = int(rng.integers(0, 2**31 - 1))
+        spikes_np, labels_np = generate_task_batch(coherences, n_per_pool, n_steps, seed=epoch_seed)
         spikes = torch.tensor(spikes_np)
         labels = torch.tensor(labels_np)
 
@@ -144,7 +145,13 @@ def train(
     return model, loss_history
 
 
-def evaluate(model: object, coherences: np.ndarray, n_per_pool: int = 20, n_steps: int = 100, seed: int = 999):
+def evaluate(
+    model: object,
+    coherences: np.ndarray,
+    n_per_pool: int = 20,
+    n_steps: int = 100,
+    seed: int = 999,
+):
     """Accuracy of a trained model across the given coherence levels."""
     import torch
 
