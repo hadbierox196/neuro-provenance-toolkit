@@ -41,8 +41,9 @@ class PreprocessReport:
     eog_scores: list[float]
 
 
-def run_preprocessing(raw, cfg: PreprocessConfig = PreprocessConfig()):
+def run_preprocessing(raw, cfg: PreprocessConfig | None = None):
     """Filter, re-reference, and ICA-clean `raw`. Returns (cleaned_raw, report, ica)."""
+    cfg = cfg if cfg is not None else PreprocessConfig()
     raw = raw.copy()
     raw.filter(l_freq=cfg.l_freq, h_freq=cfg.h_freq, fir_design="firwin", verbose=False)
     if cfg.notch_freqs:

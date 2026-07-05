@@ -6,10 +6,10 @@ work on spikes from either `lif_decision_network` or
 """
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 
 
 def plot_raster(
@@ -48,7 +48,9 @@ def plot_population_rates(
     ax.plot(rate_t_ms, rate_a_hz, color="#1f77b4", label="pool A")
     ax.plot(rate_t_ms, rate_b_hz, color="#d62728", label="pool B")
     if decision_threshold_hz is not None:
-        ax.axhline(decision_threshold_hz, color="gray", linestyle="--", linewidth=1, label="decision threshold")
+        ax.axhline(
+            decision_threshold_hz, color="gray", linestyle="--", linewidth=1, label="decision threshold"
+        )
     if decision_time_ms is not None:
         ax.axvline(decision_time_ms, color="black", linestyle=":", linewidth=1, label="decision")
     ax.set_xlabel("time (ms)")

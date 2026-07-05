@@ -18,7 +18,11 @@ from provenance_pipeline import (
     assert_clean,
     filter_clean_epochs,
 )
-from provenance_pipeline.propagation import apply_average_reference, apply_temporal_filter, wrap_opaque_transform
+from provenance_pipeline.propagation import (
+    apply_average_reference,
+    apply_temporal_filter,
+    wrap_opaque_transform,
+)
 
 
 def test_new_array_is_clean() -> None:
@@ -129,7 +133,6 @@ def test_filter_clean_epochs_removes_exactly_the_bad_ones() -> None:
 
 def test_taint_never_heals() -> None:
     """Property test: across random operation sequences, taint per-sample never decreases."""
-    rng = np.random.default_rng(42)
     n_trials = 30
 
     def random_op(ta: TaintedArray, trial_rng: np.random.Generator) -> TaintedArray:

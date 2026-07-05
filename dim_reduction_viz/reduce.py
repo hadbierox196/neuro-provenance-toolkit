@@ -41,7 +41,9 @@ def pca_via_svd(data: np.ndarray, n_components: int | None = None) -> PCAResult:
     )
 
 
-def umap_embedding(data: np.ndarray, n_components: int = 2, seed: int | None = None, **kwargs) -> np.ndarray | None:
+def umap_embedding(
+    data: np.ndarray, n_components: int = 2, seed: int | None = None, **kwargs
+) -> np.ndarray | None:
     """UMAP embedding if `umap-learn` is installed, else None (caller should fall back to PCA)."""
     try:
         import umap

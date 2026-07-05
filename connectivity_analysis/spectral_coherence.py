@@ -112,7 +112,9 @@ if __name__ == "__main__":
     assert matrix[0, 1] > matrix[0, 2], "shared-source pair should out-cohere unrelated pairs in-band"
 
     fig = plot_matrix_heatmap(
-        matrix, title="Alpha-band (8-12 Hz) coherence", labels=["coupled_a", "coupled_b", "indep_a", "indep_b"]
+        matrix,
+        title="Alpha-band (8-12 Hz) coherence",
+        labels=["coupled_a", "coupled_b", "indep_a", "indep_b"],
     )
     out_path = "/tmp/coherence_heatmap.png"
     fig.savefig(out_path, dpi=120)

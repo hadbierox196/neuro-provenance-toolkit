@@ -58,7 +58,7 @@ class DecisionResult:
 
 def run_decision_trial(
     coherence: float,
-    params: DecisionNetworkParams = DecisionNetworkParams(),
+    params: DecisionNetworkParams | None = None,
     duration_ms: float = 1000.0,
     decision_threshold_hz: float = 55.0,
     smoothing_ms: float = 20.0,
@@ -79,6 +79,7 @@ def run_decision_trial(
     """
     import brian2 as b2
 
+    params = params if params is not None else DecisionNetworkParams()
     b2.start_scope()
     if seed is not None:
         np.random.seed(seed)
@@ -113,13 +114,21 @@ def run_decision_trial(
 
     rate_a_hz = params.base_rate_hz * (1 + params.rate_gain * coherence)
     rate_b_hz = params.base_rate_hz * (1 - params.rate_gain * coherence)
-    input_a = b2.PoissonInput(pool_a, "I_syn", params.n_external, rate_a_hz * b2.Hz, params.w_external_mv * b2.mV)
-    input_b = b2.PoissonInput(pool_b, "I_syn", params.n_external, rate_b_hz * b2.Hz, params.w_external_mv * b2.mV)
+    b2.PoissonInput(
+        pool_a, "I_syn", params.n_external, rate_a_hz * b2.Hz, params.w_external_mv * b2.mV
+    )
+    b2.PoissonInput(
+        pool_b, "I_syn", params.n_external, rate_b_hz * b2.Hz, params.w_external_mv * b2.mV
+    )
 
     inhib_namespace = {"w_inhib": params.w_inhib_mv * b2.mV}
-    cross_ab = b2.Synapses(pool_a, pool_b, on_pre="I_syn_post += w_inhib", namespace=inhib_namespace, name="cross_ab")
+    cross_ab = b2.Synapses(
+        pool_a, pool_b, on_pre="I_syn_post += w_inhib", namespace=inhib_namespace, name="cross_ab"
+    )
     cross_ab.connect()
-    cross_ba = b2.Synapses(pool_b, pool_a, on_pre="I_syn_post += w_inhib", namespace=inhib_namespace, name="cross_ba")
+    cross_ba = b2.Synapses(
+        pool_b, pool_a, on_pre="I_syn_post += w_inhib", namespace=inhib_namespace, name="cross_ba"
+    )
     cross_ba.connect()
 
     spikes_a = b2.SpikeMonitor(pool_a)
@@ -134,7 +143,7 @@ def run_decision_trial(
     rate_t_ms = rate_mon_a.t / b2.ms
 
     winner, decision_time_ms = "undecided", None
-    for t_ms, ra, rb in zip(rate_t_ms, smooth_a, smooth_b):
+    for t_ms, ra, rb in zip(rate_t_ms, smooth_a, smooth_b, strict=True):
         if ra >= decision_threshold_hz or rb >= decision_threshold_hz:
             winner = "A" if ra >= rb else "B"
             decision_time_ms = float(t_ms)
@@ -156,7 +165,7 @@ def run_decision_trial(
 def run_coherence_sweep(
     coherences: list[float],
     n_trials_per_level: int = 10,
-    params: DecisionNetworkParams = DecisionNetworkParams(),
+    params: DecisionNetworkParams | None = None,
     duration_ms: float = 1000.0,
     seed0: int = 0,
 ) -> dict[float, dict[str, list[float]]]:
@@ -165,7 +174,7 @@ def run_coherence_sweep(
     trial = 0
     for coherence in coherences:
         winners, rts = [], []
-        for rep in range(n_trials_per_level):
+        for _rep in range(n_trials_per_level):
             res = run_decision_trial(coherence, params, duration_ms, seed=seed0 + trial)
             winners.append(res.winner)
             if res.decision_time_ms is not None:

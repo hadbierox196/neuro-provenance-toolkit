@@ -146,7 +146,7 @@ def k_fold_indices(n: int, k: int, seed: int = 0) -> list[tuple[np.ndarray, np.n
 def confusion_matrix_binary(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
     """2x2 confusion matrix, rows=true, cols=predicted, no sklearn."""
     cm = np.zeros((2, 2), dtype=np.int64)
-    for t, p in zip(y_true, y_pred):
+    for t, p in zip(y_true, y_pred, strict=True):
         cm[t, p] += 1
     return cm
 

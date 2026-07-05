@@ -43,7 +43,12 @@ def test_pipeline_flags_the_injected_blink() -> None:
 
 def test_notch_filter_reduces_line_noise() -> None:
     pytest.importorskip("mne")
-    from eeg_preprocessing.pipeline import PreprocessConfig, _make_synthetic_raw, compare_psd, run_preprocessing
+    from eeg_preprocessing.pipeline import (
+        PreprocessConfig,
+        _make_synthetic_raw,
+        compare_psd,
+        run_preprocessing,
+    )
 
     raw = _make_synthetic_raw(seed=0)
     cfg = PreprocessConfig(notch_freqs=(60.0,), n_ica_components=10)

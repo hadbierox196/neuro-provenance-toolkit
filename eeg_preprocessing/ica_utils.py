@@ -42,7 +42,12 @@ def fit_ica_and_find_artifacts(
     import mne
     from mne.preprocessing import ICA
 
-    ica = ICA(n_components=n_components, random_state=random_state, method="infomax", fit_params=dict(extended=True))
+    ica = ICA(
+        n_components=n_components,
+        random_state=random_state,
+        method="infomax",
+        fit_params=dict(extended=True),
+    )
     raw_for_fit = raw.copy().filter(l_freq=1.0, h_freq=None, fir_design="firwin", verbose=False)
     ica.fit(raw_for_fit)
 
@@ -51,7 +56,9 @@ def fit_ica_and_find_artifacts(
     eog_scores: list[float] = []
     if len(eog_picks) > 0 or eog_ch_names:
         ch_name_arg = list(eog_ch_names) if eog_ch_names else None
-        found_indices, scores = ica.find_bads_eog(raw, ch_name=ch_name_arg, threshold=eog_threshold, verbose=False)
+        found_indices, scores = ica.find_bads_eog(
+            raw, ch_name=ch_name_arg, threshold=eog_threshold, verbose=False
+        )
         excluded_indices = list(found_indices)
         eog_scores = np.asarray(scores).ravel().tolist()
 

@@ -36,8 +36,9 @@ class TaintPolicy:
     max_contaminated_fraction: float = 0.0
 
 
-def assert_clean(ta: TaintedArray, policy: TaintPolicy = TaintPolicy()) -> None:
+def assert_clean(ta: TaintedArray, policy: TaintPolicy | None = None) -> None:
     """Raise TaintViolationError if `ta` violates `policy`."""
+    policy = policy if policy is not None else TaintPolicy()
     if ta.max_taint() > policy.max_taint_level:
         raise TaintViolationError(
             f"stage={ta.stage!r}: max taint {ta.max_taint().name} exceeds "
@@ -52,7 +53,7 @@ def assert_clean(ta: TaintedArray, policy: TaintPolicy = TaintPolicy()) -> None:
 
 
 def filter_clean_epochs(
-    ta: TaintedArray, policy: TaintPolicy = TaintPolicy(), epoch_axis: int = 0
+    ta: TaintedArray, policy: TaintPolicy | None = None, epoch_axis: int = 0
 ) -> tuple[TaintedArray, np.ndarray]:
     """Keep only epochs that satisfy `policy`; return (kept, keep_mask).
 

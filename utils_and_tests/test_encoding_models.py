@@ -51,7 +51,9 @@ def test_poisson_glm_gradient_matches_finite_differences() -> None:
 
 def test_glm_recovers_ground_truth_kernel() -> None:
     sim = simulate_lnp(n_samples=20000, seed=0)
-    kernel_hat, bias_hat, result = fit_poisson_glm(sim.stimulus, sim.spike_counts, len(sim.kernel), l2_lambda=2.0)
+    kernel_hat, bias_hat, result = fit_poisson_glm(
+        sim.stimulus, sim.spike_counts, len(sim.kernel), l2_lambda=2.0
+    )
     assert result.success
     corr = np.corrcoef(kernel_hat, sim.kernel)[0, 1]
     assert corr > 0.9
