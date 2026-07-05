@@ -68,4 +68,5 @@ def test_ica_utils_returns_consistent_shapes() -> None:
     raw.set_eeg_reference("average", projection=False, verbose=False)
     cleaned, ica, excluded, scores = fit_ica_and_find_artifacts(raw, n_components=10)
     assert cleaned.get_data().shape == raw.get_data().shape
-    assert len(scores) == len(excluded) or len(excluded) == 0
+    assert len(scores) == 10  # one correlation score per fitted ICA component
+    assert all(0 <= idx < len(scores) for idx in excluded)  # excluded are valid component indices

@@ -102,7 +102,7 @@ def _build_model(n_per_pool: int, beta: float, decay: float):
             spikes = torch.stack(spikes_out, dim=1)
             count_a = (spikes * self.pool_a_mask).sum(dim=(1, 2))
             count_b = (spikes * self.pool_b_mask).sum(dim=(1, 2))
-            logits = torch.stack([count_b, count_a], dim=1)  # index 1 = "A correct" class
+            logits = torch.stack([count_b, count_a], dim=1) / n_steps  # scale to a sane range for softmax
             return spikes, logits
 
     return SurrogateLIFDecisionNet(n_per_pool, beta, decay)
@@ -113,7 +113,7 @@ def train(
     n_steps: int = 100,
     n_epochs: int = 150,
     batch_size: int = 32,
-    lr: float = 5e-3,
+    lr: float = 5e-4,
     beta: float = 5.0,
     decay: float = 0.9,
     seed: int = 0,
@@ -140,6 +140,7 @@ def train(
         _, logits = model(spikes)
         loss = criterion(logits, labels)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
         loss_history.append(float(loss.item()))
     return model, loss_history

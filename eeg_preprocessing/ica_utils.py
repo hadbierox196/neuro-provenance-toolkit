@@ -16,7 +16,7 @@ def fit_ica_and_find_artifacts(
     n_components: int = 10,
     random_state: int = 97,
     eog_ch_names: tuple[str, ...] | None = None,
-    eog_threshold: float = 3.0,
+    eog_threshold: float = 0.5,
 ):
     """Fit ICA and auto-exclude components correlated with an EOG channel.
 
@@ -57,7 +57,7 @@ def fit_ica_and_find_artifacts(
     if len(eog_picks) > 0 or eog_ch_names:
         ch_name_arg = list(eog_ch_names) if eog_ch_names else None
         found_indices, scores = ica.find_bads_eog(
-            raw, ch_name=ch_name_arg, threshold=eog_threshold, verbose=False
+            raw, ch_name=ch_name_arg, threshold=eog_threshold, measure="correlation", verbose=False
         )
         excluded_indices = list(found_indices)
         eog_scores = np.asarray(scores).ravel().tolist()
