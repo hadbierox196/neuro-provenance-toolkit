@@ -122,7 +122,7 @@ def train(
     beta: float = 5.0,
     decay: float = 0.9,
     seed: int = 0,
-) -> tuple["torch.nn.Module", list[float]]:
+) -> tuple[torch.nn.Module, list[float]]:
     """Train `SurrogateLIFDecisionNet` on random-coherence trials; returns (model, loss history)."""
     import torch
     from torch import nn
