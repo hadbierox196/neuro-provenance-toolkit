@@ -16,6 +16,18 @@ dependencies = [
 viz = ["plotly", "umap-learn"]
 dev = ["pytest", "ruff", "mypy"]
 
+[tool.setuptools.packages.find]
+include = [
+    "encoding_models*",
+    "spiking_networks*",
+    "dim_reduction_viz*",
+    "eeg_preprocessing*",
+    "provenance_pipeline*",
+    "classifier_benchmark*",
+    "connectivity_analysis*",
+]
+exclude = ["utils_and_tests*"]
+
 [tool.ruff]
 line-length = 110
 target-version = "py311"
