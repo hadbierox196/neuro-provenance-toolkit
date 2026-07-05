@@ -17,6 +17,8 @@ all-or-nothing threshold effect.
 """
 from __future__ import annotations
 
+from typing import TypedDict
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -162,15 +164,20 @@ def run_decision_trial(
     )
 
 
+class CoherenceLevelResult(TypedDict):
+    winners: list[str]
+    decision_times_ms: list[float]
+
+
 def run_coherence_sweep(
     coherences: list[float],
     n_trials_per_level: int = 10,
     params: DecisionNetworkParams | None = None,
     duration_ms: float = 1000.0,
     seed0: int = 0,
-) -> dict[float, dict[str, list[float]]]:
+) -> dict[float, CoherenceLevelResult]:
     """Run repeated trials per coherence level; returns per-level winners and RTs."""
-    results: dict[float, dict[str, list[float]]] = {}
+    results: dict[float, CoherenceLevelResult] = {}
     trial = 0
     for coherence in coherences:
         winners, rts = [], []

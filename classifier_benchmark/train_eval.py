@@ -222,7 +222,7 @@ if __name__ == "__main__":
     splits = k_fold_indices(len(X_clean), k=5, seed=0)
     accuracies, aucs = [], []
     for fold, (train_idx, val_idx) in enumerate(splits):
-        acc, auc, _, _ = train_one_fold(
+        acc, auc, _y_true_fold, _y_pred_fold = train_one_fold(
             X_clean[train_idx], y_clean[train_idx], X_clean[val_idx], y_clean[val_idx]
         )
         accuracies.append(acc)
@@ -235,7 +235,7 @@ if __name__ == "__main__":
     perm = rng.permutation(len(X_clean))
     n_train = int(0.8 * len(X_clean))
     train_idx, test_idx = perm[:n_train], perm[n_train:]
-    _, _, y_test_true, y_test_pred = train_one_fold(
+    _acc_test, _auc_test, y_test_true, y_test_pred = train_one_fold(
         X_clean[train_idx], y_clean[train_idx], X_clean[test_idx], y_clean[test_idx]
     )
     cm = confusion_matrix_binary(y_test_true, y_test_pred)

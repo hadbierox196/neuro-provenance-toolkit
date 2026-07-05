@@ -89,6 +89,8 @@ if __name__ == "__main__":
 
     csp = CSP(n_components=3)
     feats = csp.fit_transform(X, y)
+    assert csp.filters_ is not None
+    assert csp.classes_ is not None
     print("CSP feature shape (expect (100, 6)):", feats.shape)
     print("filters_ shape (expect (6, 8)):", csp.filters_.shape)
 

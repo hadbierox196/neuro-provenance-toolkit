@@ -61,6 +61,7 @@ def filter_clean_epochs(
     indexes trials. Per-epoch severity is the worst taint level and the
     contaminated-sample fraction within that epoch.
     """
+    policy = policy if policy is not None else TaintPolicy()
     other_axes = tuple(i for i in range(ta.taint.ndim) if i != epoch_axis)
     per_epoch_max = np.max(ta.taint, axis=other_axes)
     per_epoch_frac = np.mean(ta.taint >= TaintLevel.CONTAMINATED, axis=other_axes)

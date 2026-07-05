@@ -14,7 +14,12 @@ PyTorch installed; only `SurrogateLIFDecisionNet` and `train` need
 """
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
+
+if TYPE_CHECKING:
+    import torch
 
 
 def generate_task_batch(
@@ -80,8 +85,8 @@ def _build_model(n_per_pool: int, beta: float, decay: float):
             self.beta = beta
             self.decay = decay
             n = 2 * n_per_pool
-            self.w_rec = nn.Parameter(0.15 * torch.randn(n, n) / n**0.5)
-            self.w_in = nn.Parameter(torch.ones(n) * 0.6)
+            self.w_rec: torch.Tensor = nn.Parameter(0.15 * torch.randn(n, n) / n**0.5)
+            self.w_in: torch.Tensor = nn.Parameter(torch.ones(n) * 0.6)
             mask_a = torch.zeros(n)
             mask_a[:n_per_pool] = 1.0
             self.register_buffer("pool_a_mask", mask_a)
@@ -100,8 +105,8 @@ def _build_model(n_per_pool: int, beta: float, decay: float):
                 spikes_out.append(spike)
                 prev_spike = spike
             spikes = torch.stack(spikes_out, dim=1)
-            count_a = (spikes * self.pool_a_mask).sum(dim=(1, 2))
-            count_b = (spikes * self.pool_b_mask).sum(dim=(1, 2))
+            count_a = (spikes * self.pool_a_mask).sum(dim=(1, 2))  # type: ignore[operator]
+            count_b = (spikes * self.pool_b_mask).sum(dim=(1, 2))  # type: ignore[operator]
             logits = torch.stack([count_b, count_a], dim=1) / n_steps  # scale to a sane range for softmax
             return spikes, logits
 
@@ -117,7 +122,7 @@ def train(
     beta: float = 5.0,
     decay: float = 0.9,
     seed: int = 0,
-) -> tuple[object, list[float]]:
+) -> tuple["torch.nn.Module", list[float]]:
     """Train `SurrogateLIFDecisionNet` on random-coherence trials; returns (model, loss history)."""
     import torch
     from torch import nn
@@ -147,12 +152,12 @@ def train(
 
 
 def evaluate(
-    model: object,
+    model: torch.nn.Module,
     coherences: np.ndarray,
     n_per_pool: int = 20,
     n_steps: int = 100,
     seed: int = 999,
-):
+) -> float:
     """Accuracy of a trained model across the given coherence levels."""
     import torch
 

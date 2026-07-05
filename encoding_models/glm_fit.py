@@ -61,9 +61,9 @@ if __name__ == "__main__":
     for i in range(len(theta_check)):
         perturbed = theta_check.copy()
         perturbed[i] += eps
-        f_plus, _ = _poisson_nll_and_grad(perturbed, X_check, y_check, l2_lambda=0.5)
+        f_plus, _grad_plus = _poisson_nll_and_grad(perturbed, X_check, y_check, l2_lambda=0.5)
         perturbed[i] -= 2 * eps
-        f_minus, _ = _poisson_nll_and_grad(perturbed, X_check, y_check, l2_lambda=0.5)
+        f_minus, _grad_minus = _poisson_nll_and_grad(perturbed, X_check, y_check, l2_lambda=0.5)
         numeric_grad[i] = (f_plus - f_minus) / (2 * eps)
 
     max_diff = float(np.abs(analytic_grad - numeric_grad).max())
